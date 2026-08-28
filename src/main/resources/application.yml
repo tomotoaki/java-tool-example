@@ -1,0 +1,27 @@
+spring:
+  main:
+    # CLI アプリケーションなので Web サーバーを起動しない
+    web-application-type: none
+    banner-mode: off
+
+  datasource:
+    # ファイルベースの H2。実行のたびにデータが消えないよう ./data 配下に永続化する
+    url: jdbc:h2:file:./data/tokendb;DB_CLOSE_ON_EXIT=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  sql:
+    init:
+      # schema.sql は CREATE TABLE IF NOT EXISTS なので毎回実行しても安全
+      mode: always
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: WARN
+    com.example.tool: INFO
