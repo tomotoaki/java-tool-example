@@ -60,11 +60,8 @@ release:
     description: |
       ## Download
 
-      This release publishes the packaged distribution artifact.
-
-      - [${PACKAGE_FILE}](${CI_PROJECT_URL}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/target/${PACKAGE_FILE})
-      - [Package Registry](${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${CI_COMMIT_TAG}/${PACKAGE_FILE})
+      Release artifact for $CI_COMMIT_TAG.
     assets:
       links:
         - name: "${PACKAGE_FILE}"
-          url: "${CI_PROJECT_URL}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/target/${PACKAGE_FILE}"
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${CI_COMMIT_TAG}/${PACKAGE_FILE}"
