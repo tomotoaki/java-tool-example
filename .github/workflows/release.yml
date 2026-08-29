@@ -24,8 +24,11 @@ jobs:
           java-version: '25'
           cache: maven
 
+      - name: Grant execute permission for Maven wrapper
+        run: chmod +x ./mvnw
+
       - name: Build distribution zip
-        run: mvn --batch-mode --no-transfer-progress clean package
+        run: ./mvnw --batch-mode --no-transfer-progress clean package
 
       - name: Verify distribution zip
         run: test -f target/java-tool-example.zip
