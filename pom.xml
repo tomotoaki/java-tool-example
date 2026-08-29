@@ -50,6 +50,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- CLI 用テーブル整形 -->
+        <dependency>
+            <groupId>com.github.freva</groupId>
+            <artifactId>ascii-table</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+
         <!-- テスト -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,6 +1,7 @@
 package com.example.tool;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.example.tool.entity.AccessToken;
 import com.example.tool.service.AccessTokenService;
+import com.github.freva.asciitable.AsciiTable;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +79,7 @@ public class AccessTokenCliApplication implements CommandLineRunner {
 
         AccessToken created = accessTokenService.issue(owner, validDays);
         System.out.println("トークンを発行しました。");
-        printToken(created);
+        printTokens(List.of(created));
     }
 
     private void doList() {
@@ -86,7 +88,7 @@ public class AccessTokenCliApplication implements CommandLineRunner {
             System.out.println("登録されているトークンはありません。");
             return;
         }
-        tokens.forEach(this::printToken);
+        printTokens(tokens);
     }
 
     private void doGet(String[] args) {
@@ -100,7 +102,7 @@ public class AccessTokenCliApplication implements CommandLineRunner {
             System.out.println("id=" + id + " のトークンは見つかりませんでした。");
             return;
         }
-        printToken(token.get());
+        printTokens(List.of(token.get()));
     }
 
     private void doUpdate(String[] args) {
@@ -114,7 +116,7 @@ public class AccessTokenCliApplication implements CommandLineRunner {
 
         AccessToken updated = accessTokenService.update(id, owner, validDays);
         System.out.println("トークンを更新しました。");
-        printToken(updated);
+        printTokens(List.of(updated));
     }
 
     private void doRevoke(String[] args) {
@@ -125,7 +127,7 @@ public class AccessTokenCliApplication implements CommandLineRunner {
         Long id = Long.valueOf(args[1]);
         AccessToken revoked = accessTokenService.revoke(id);
         System.out.println("トークンを無効化しました。");
-        printToken(revoked);
+        printTokens(List.of(revoked));
     }
 
     private void doDelete(String[] args) {
@@ -138,16 +140,23 @@ public class AccessTokenCliApplication implements CommandLineRunner {
         System.out.println(deleted ? "トークンを削除しました。id=" + id : "id=" + id + " のトークンは見つかりませんでした。");
     }
 
-    private void printToken(AccessToken token) {
-        System.out.printf(
-                "id=%d, token=%s, owner=%s, status=%s, createdAt=%s, expiresAt=%s%n",
-                token.getId(),
-                token.getTokenValue(),
-                token.getOwnerName(),
-                token.getStatus(),
-                token.getCreatedAt() != null ? token.getCreatedAt().format(FORMATTER) : "-",
-                token.getExpiresAt() != null ? token.getExpiresAt().format(FORMATTER) : "無期限"
-        );
+    private void printTokens(List<AccessToken> tokens) {
+        String[] headers = {"id", "token", "owner", "status", "createdAt", "expiresAt"};
+        List<String[]> rows = new ArrayList<>();
+
+        for (AccessToken token : tokens) {
+            rows.add(new String[] {
+                    String.valueOf(token.getId()),
+                    token.getTokenValue(),
+                    token.getOwnerName(),
+                    token.getStatus() != null ? token.getStatus().toString() : "",
+                    token.getCreatedAt() != null ? token.getCreatedAt().format(FORMATTER) : "-",
+                    token.getExpiresAt() != null ? token.getExpiresAt().format(FORMATTER) : "-"
+            });
+        }
+
+        String[][] data = rows.toArray(String[][]::new);
+        System.out.println(AsciiTable.getTable(headers, data));
     }
 
     private void printUsage() {

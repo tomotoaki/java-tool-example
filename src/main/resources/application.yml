@@ -23,5 +23,5 @@ mybatis:
 
 logging:
   level:
-    root: WARN
-    com.example.tool: INFO
+    root: ERROR
+    com.example.tool: WARN
