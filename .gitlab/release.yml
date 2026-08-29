@@ -4,6 +4,12 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  PACKAGE_NAME: "java-tool-example"
+  PACKAGE_FILE: "java-tool-example.zip"
+
+default:
+  before_script:
+    - chmod +x ./mvnw
 
 cache:
   key: "$CI_COMMIT_REF_SLUG"
@@ -14,11 +20,11 @@ build:
   stage: build
   image: maven:3.9-eclipse-temurin-25
   script:
-    - chmod +x ./mvnw
-    - ./mvnw -B clean package -DskipTests
-    - echo "ZIP_FILE_NAME=java-tool-example.zip" >> build.env
+    - ./mvnw --batch-mode --no-transfer-progress clean package -DskipTests
+    - echo "ZIP_FILE_NAME=${PACKAGE_FILE}" >> build.env
     - echo "BUILD_JOB_ID=${CI_JOB_ID}" >> build.env
   artifacts:
+    when: on_success
     paths:
       - target/java-tool-example.jar
       - target/java-tool-example.zip
@@ -34,13 +40,29 @@ release:
       artifacts: true
   rules:
     - if: '$CI_COMMIT_TAG'
+      when: on_success
   script:
-    - echo "Creating release for tag $CI_COMMIT_TAG"
+    - |
+      PACKAGE_VERSION="${CI_COMMIT_TAG}"
+      PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
+
+      curl --fail --silent --show-error \
+        --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+        --upload-file "target/${PACKAGE_FILE}" \
+        "${PACKAGE_URL}"
+
+      echo "Published release package to GitLab Package Registry: ${PACKAGE_URL}"
   release:
     tag_name: "$CI_COMMIT_TAG"
     name: "Release $CI_COMMIT_TAG"
-    description: "Automated release for $CI_COMMIT_TAG"
+    description: |
+      ## Download
+
+      This release publishes the packaged distribution artifact.
+
+      - [${PACKAGE_FILE}](${CI_PROJECT_URL}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/target/${PACKAGE_FILE})
+      - [Package Registry](${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${CI_COMMIT_TAG}/${PACKAGE_FILE})
     assets:
       links:
-        - name: "$ZIP_FILE_NAME"
-          url: "${CI_PROJECT_URL}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/target/${ZIP_FILE_NAME}"
+        - name: "${PACKAGE_FILE}"
+          url: "${CI_PROJECT_URL}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/target/${PACKAGE_FILE}"
