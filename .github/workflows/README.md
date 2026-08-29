@@ -73,7 +73,7 @@ git push origin v1.0.1
 
 ## ローカルでの確認
 
-workflow と同じ配布 zip は、ローカルでも次のコマンドで生成できます。
+ローカルでは次のコマンドで同じ配布 zip を生成できます。
 
 ```bash
 ./mvnw --batch-mode --no-transfer-progress clean package

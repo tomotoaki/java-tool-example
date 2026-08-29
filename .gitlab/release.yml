@@ -1,0 +1,46 @@
+stages:
+  - build
+  - release
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .m2/repository
+
+build:
+  stage: build
+  image: maven:3.9-eclipse-temurin-25
+  script:
+    - chmod +x ./mvnw
+    - ./mvnw -B clean package -DskipTests
+    - echo "ZIP_FILE_NAME=java-tool-example.zip" >> build.env
+    - echo "BUILD_JOB_ID=${CI_JOB_ID}" >> build.env
+  artifacts:
+    paths:
+      - target/java-tool-example.jar
+      - target/java-tool-example.zip
+    reports:
+      dotenv: build.env
+    expire_in: 30 days
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: build
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - echo "Creating release for tag $CI_COMMIT_TAG"
+  release:
+    tag_name: "$CI_COMMIT_TAG"
+    name: "Release $CI_COMMIT_TAG"
+    description: "Automated release for $CI_COMMIT_TAG"
+    assets:
+      links:
+        - name: "$ZIP_FILE_NAME"
+          url: "${CI_PROJECT_URL}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/target/${ZIP_FILE_NAME}"
