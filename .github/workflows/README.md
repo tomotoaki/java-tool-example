@@ -26,7 +26,7 @@ GitHub の **Actions** から **Build and Release** を選択し、**Run workflo
 1. ソースコードを checkout
 2. Temurin Java 25 をセットアップ
 3. Maven の依存関係をキャッシュ
-4. `mvn clean package` を実行
+4. `./mvnw --batch-mode --no-transfer-progress clean package` を実行
 5. `target/java-tool-example.zip` の生成を確認
 6. タグ起点の場合、GitHub Release を作成して zip を Assets に添付
 
@@ -76,7 +76,7 @@ git push origin v1.0.1
 workflow と同じ配布 zip は、ローカルでも次のコマンドで生成できます。
 
 ```bash
-mvn clean package
+./mvnw --batch-mode --no-transfer-progress clean package
 ```
 
 生成物は `target/java-tool-example.zip` です。

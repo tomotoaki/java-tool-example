@@ -18,40 +18,22 @@ Spring Boot 4.0.6 + MyBatis + H2 で作成した、アクセストークンを�
 - Java 17 以上（動作確認は Java 25）
 - Maven 3.9 以上
 
+> このリポジトリでは Maven Wrapper を利用するため、ローカルに Maven を別途入れなくても動作します。
+
 ## ビルド
 
 ```bash
-mvn clean package
+./mvnw clean package
 ```
 
 `target/java-tool-example.zip` に、jar、README、Windows 用スクリプト、Linux/Mac 用スクリプトが生成されます。
 
 ## 実行
 
-### Windows (run.bat)
+データは `./data/tokendb.mv.db`（H2 ファイル DB）に永続化されるため、実行のたびにリセットされません。
+DB を初期化したい場合は `data` ディレクトリを削除してください。
 
-```bat
-run.bat create alice 30
-run.bat list
-run.bat get 1
-run.bat update 1 alice2 60
-run.bat revoke 1
-run.bat delete 1
-```
-
-### Linux/Mac (run.sh)
-
-```bash
-chmod +x run.sh
-./run.sh create alice 30
-./run.sh list
-./run.sh get 1
-./run.sh update 1 alice2 60
-./run.sh revoke 1
-./run.sh delete 1
-```
-
-### 直接 jar を実行する場合
+### 直接実行 (jar)
 
 ```bash
 # トークン発行（所有者名、任意で有効日数）
@@ -74,8 +56,28 @@ java -jar target/java-tool-example.jar revoke 1
 java -jar target/java-tool-example.jar delete 1
 ```
 
-データは `./data/tokendb.mv.db`（H2 ファイル DB）に永続化されるため、実行のたびにリセットされません。
-DB を初期化したい場合は `data` ディレクトリを削除してください。
+### Windows (run.bat)
+
+```cmd
+run.bat create alice 30
+run.bat list
+run.bat get 1
+run.bat update 1 alice2 60
+run.bat revoke 1
+run.bat delete 1
+```
+
+### Linux/Mac (run.sh)
+
+```bash
+chmod +x run.sh
+./run.sh create alice 30
+./run.sh list
+./run.sh get 1
+./run.sh update 1 alice2 60
+./run.sh revoke 1
+./run.sh delete 1
+```
 
 ## メモ
 
